@@ -9,7 +9,7 @@ This project analyzes customer churn patterns in a telecom company using explora
 - **Programming:** Python (Pandas, NumPy, Scikit-learn, XGBoost)
 - **Data Visualization:** Matplotlib, Seaborn
 - **API Development:** FastAPI, Uvicorn
-- **Environment:** Jupyter Notebook, SQL
+- **Environment:** Jupyter Notebook
 
 ## Project Structure
 
