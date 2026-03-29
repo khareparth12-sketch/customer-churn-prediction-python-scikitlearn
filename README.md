@@ -76,3 +76,5 @@ uvicorn api.app:app --reload
 - **Interactive Dashboards:** Develop an interactive PowerBI or Tableau dashboard for stakeholder reporting (within the `dashboard/` folder).
 - **A/B Testing:** Design and perform A/B testing on retention campaigns.
 - **Monitoring:** Integrate drift monitoring for the deployed API.
+
+Deployed at: https://customer-churn-prediction-python.onrender.com/
