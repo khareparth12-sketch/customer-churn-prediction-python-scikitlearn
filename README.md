@@ -1,80 +1,270 @@
-# Customer Churn Analysis – Telecommunications Industry
+# 🔄 Customer Churn Prediction
 
-## Overview
+> An end-to-end Machine Learning application that predicts customer churn probability using a tuned XGBoost model — served via a FastAPI backend and an interactive Streamlit dashboard, deployed on Render with Docker.
 
-This project analyzes customer churn patterns in a telecom company using exploratory data analysis, data cleaning, and machine learning techniques. We have identified high-risk customer profiles and deployed an XGBoost classification model via a FastAPI application to provide real-time churn predictions.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://customer-churn-prediction-python.onrender.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-EC6C00?style=for-the-badge&logo=python&logoColor=white)](https://xgboost.readthedocs.io/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-## Tools & Technologies
+---
 
-- **Programming:** Python (Pandas, NumPy, Scikit-learn, XGBoost)
-- **Data Visualization:** Matplotlib, Seaborn
-- **API Development:** FastAPI, Uvicorn
-- **Environment:** Jupyter Notebook
+## 📌 Problem Statement
 
-## Project Structure
+Customer churn is one of the most critical challenges for subscription-based telecom businesses. Losing a customer is significantly more expensive than retaining one. This project builds a production-ready ML system that identifies at-risk customers **before they churn**, enabling proactive retention strategies.
 
-```text
-api/
- ├── app.py                     # FastAPI application for serving the model
- ├── schema.py                  # Pydantic schemas for API inputs
- └── utils.py                   # API utilities and feature definitions
+**Dataset:** [IBM Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 
-data/
- ├── raw/                       # Raw, unprocessed datasets
- └── processed/                 # Cleaned data ready for modeling
+---
 
-models/
- ├── xgb_tuned_model.pkl        # Best performing tuned XGBoost model
- ├── rf_model.pkl               # Random Forest model
- ├── logistic_model.pkl         # Logistic Regression model
- └── scaler.pkl                 # Data scaler for preprocessing
+## ✨ Features
 
-notebooks/
- ├── 01_data_overview.ipynb     # Initial data review
- ├── 02_data_cleaning.ipynb     # Handling missing values and outliers
- ├── 03_eda_churn.ipynb         # Exploratory Data Analysis
- ├── 04_preprocessing.ipynb     # Feature engineering and scaling
- ├── 05_modeling_and_tuning.ipynb # Training Models & Hyperparameter Tuning
- └── 06_model_interpretation.ipynb# Feature Importance & SHAP analysis
+- 🎯 **Churn probability scoring** with a business-tuned risk threshold (0.35)
+- 📊 **Analytics dashboard** — KPIs, churn distribution charts, and key metrics
+- 🔮 **Manual prediction form** — input customer data and get instant predictions
+- 🔍 **Customer Explorer** — select any customer from the dataset for auto-filled predictions
+- ⚡ **REST API** — clean FastAPI backend ready for integration
+- 🐳 **Fully containerized** — Docker Compose multi-service setup
+- ☁️ **Cloud deployed** — live on Render
 
-reports/
- ├── churn_analysis_report.md   # Business insights from EDA
- └── model_report.md            # Model evaluation metrics
+---
 
-sql/                            # (Pending) SQL scripts for data extraction
-dashboard/                      # (Pending) PowerBI/Tableau dashboard files
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| ML Model | XGBoost (tuned) + Scikit-learn |
+| Backend API | FastAPI |
+| Frontend | Streamlit |
+| Containerization | Docker + Docker Compose |
+| Deployment | Render |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│                  Render Cloud                │
+│                                             │
+│  ┌──────────────────┐  ┌─────────────────┐  │
+│  │  Streamlit App   │  │   FastAPI App   │  │
+│  │   (port 10000)   │──│   (port 8000)   │  │
+│  │                  │  │                 │  │
+│  │  • Analytics Tab │  │  /predict       │  │
+│  │  • Predict Tab   │  │  /model-info    │  │
+│  │  • Explorer Tab  │  │  /health        │  │
+│  └──────────────────┘  └────────┬────────┘  │
+│                                 │            │
+│                        ┌────────▼────────┐   │
+│                        │  xgb_tuned_     │   │
+│                        │  model.pkl      │   │
+│                        │  scaler.pkl     │   │
+│                        └─────────────────┘   │
+└─────────────────────────────────────────────┘
 ```
 
-## Methodology
+- Streamlit communicates with FastAPI over **localhost** with retry logic
+- Both services are orchestrated via **Docker Compose**
+- FastAPI loads the serialized model and scaler at startup
 
-1. **Data Collection & Exploration:** Understanding the raw data structure.
-2. **Data Cleaning:** Handling missing variables and correcting data types.
-3. **Exploratory Data Analysis (EDA):** Identifying trends among churned vs. retained customers.
-4. **Data Preprocessing:** Feature engineering, encoding, scaling, and handling class imbalances.
-5. **Machine Learning Modeling:** Training and tuning Logistic Regression, Random Forest, and XGBoost models.
-6. **Model Deployment:** Serving the best-performing model (XGBoost) as a REST API using FastAPI.
+---
 
-## Key Insights
+## 🔌 API Endpoints
 
-- **Early Attrition:** Nearly 48% churn observed among first-year customers.
-- **Contract Type:** Month-to-month contracts showed the highest attrition rate.
-- **Payment Method:** Electronic check users exhibited elevated churn.
-- **Pricing:** Mid-to-high pricing tiers faced increased customer dissatisfaction, whereas long-term contracts demonstrated strong retention.
+Base URL: `https://customer-churn-prediction-python.onrender.com`
 
-## API Usage
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Root check — confirms API is running |
+| `GET` | `/health` | Health status of the service |
+| `GET` | `/model-info` | Model metadata and feature list |
+| `POST` | `/predict` | Returns churn probability and risk flag |
 
-The XGBoost model is served at the `/predict` endpoint via FastApi.
-You can run the API locally using:
+### `/predict` — Request Body Example
+
+```json
+{
+  "gender": "Male",
+  "SeniorCitizen": 0,
+  "Partner": "Yes",
+  "Dependents": "No",
+  "tenure": 12,
+  "PhoneService": "Yes",
+  "MultipleLines": "No",
+  "InternetService": "Fiber optic",
+  "OnlineSecurity": "No",
+  "OnlineBackup": "No",
+  "DeviceProtection": "No",
+  "TechSupport": "No",
+  "StreamingTV": "No",
+  "StreamingMovies": "No",
+  "Contract": "Month-to-month",
+  "PaperlessBilling": "Yes",
+  "PaymentMethod": "Electronic check",
+  "MonthlyCharges": 70.35,
+  "TotalCharges": 844.20
+}
+```
+
+### `/predict` — Response Example
+
+```json
+{
+  "churn_probability": 0.72,
+  "risk_flag": "HIGH RISK",
+  "threshold_used": 0.35
+}
+```
+
+---
+
+## 🧠 Model Details
+
+| Property | Value |
+|---|---|
+| Algorithm | XGBoost (tuned via hyperparameter search) |
+| Output | Churn probability (0.0 – 1.0) |
+| Risk Threshold | **0.35** (business-oriented, favors recall) |
+| Artifacts | `xgb_tuned_model.pkl`, `scaler.pkl` |
+
+**Feature Engineering:**
+- Strict feature ordering enforced via `FEATURE_COLUMNS`
+- Scaling applied only to numeric features: `tenure`, `MonthlyCharges`, `TotalCharges`
+- All categorical features passed as-is after encoding
+
+> The threshold of **0.35** (rather than the default 0.5) is a deliberate business decision — it prioritizes catching more at-risk customers, accepting a slightly higher false positive rate.
+
+---
+
+## 🖥️ Frontend Dashboard
+
+The Streamlit app has three tabs:
+
+### 📊 Tab 1 — Analytics
+- KPI metric cards (total customers, churn rate, etc.)
+- Churn distribution visualizations
+
+### 🔮 Tab 2 — Prediction
+- Manual input form for all customer features
+- Calls `/predict` and displays:
+  - Churn probability score
+  - Visual gauge chart
+  - Risk level message (Low / High Risk)
+
+### 🔍 Tab 3 — Customer Explorer
+- Dropdown to select any customer from the dataset
+- Auto-populates all input fields
+- Run prediction instantly with one click
+
+---
+
+## 📸 Screenshots
+
+### 📊 Analytics Tab
+![Analytics Tab](screenshots/analytics.png)
+
+### 🔮 Prediction — Churn Detected
+![Churn Prediction](screenshots/churn_predict.png)
+
+### ✅ Prediction — No Churn
+![No Churn Prediction](screenshots/noChurn_predict.png)
+
+### 🔍 Customer Explorer
+![Customer Explorer](screenshots/explore.png)
+
+---
+
+## 🚀 Live Demo
+
+👉 **[https://customer-churn-prediction-python.onrender.com/](https://customer-churn-prediction-python.onrender.com/)**
+
+> ⚠️ Hosted on Render's free tier — the service may take **30–60 seconds to cold start** if it has been idle.
+
+---
+
+## 🐳 Run Locally with Docker
+
+### Prerequisites
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed
+
+### Steps
 
 ```bash
-uvicorn api.app:app --reload
+# 1. Clone the repository
+git clone https://github.com/khareparth12-sketch/customer-churn-prediction-python-scikitlearn.git
+cd customer-churn-prediction-python-scikitlearn
+
+# 2. Build and start both services
+docker-compose up --build
+
+# 3. Access the apps
+# Streamlit → http://localhost:10000
+# FastAPI    → http://localhost:8000/docs
 ```
 
-## Future Work
+To stop the services:
 
-- **SQL Data Pipeline:** Implement SQL scripts for robust data extraction.
-- **Interactive Dashboards:** Develop an interactive PowerBI or Tableau dashboard for stakeholder reporting (within the `dashboard/` folder).
-- **A/B Testing:** Design and perform A/B testing on retention campaigns.
-- **Monitoring:** Integrate drift monitoring for the deployed API.
+```bash
+docker-compose down
+```
 
-Deployed at: https://customer-churn-prediction-python.onrender.com/
+---
+
+## 📁 Project Structure
+
+```
+customer-churn-prediction-python-scikitlearn/
+│
+├── backend/
+│   ├── main.py               # FastAPI app & endpoints
+│   ├── xgb_tuned_model.pkl   # Trained XGBoost model
+│   ├── scaler.pkl            # Feature scaler
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── app.py                # Streamlit dashboard
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── screenshots/
+│   ├── analytics.png
+│   ├── churn_predict.png
+│   ├── noChurn_predict.png
+│   └── explore.png
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## 🔭 Future Improvements
+
+- [ ] Add SHAP explainability — show which features drove each prediction
+- [ ] Batch prediction endpoint — upload a CSV and get bulk scores
+- [ ] Model retraining pipeline with MLflow tracking
+- [ ] Authentication layer for the API
+- [ ] CI/CD pipeline with GitHub Actions
+- [ ] A/B testing support for threshold experimentation
+
+---
+
+## 👤 Author
+
+**Parth Khare**
+- GitHub: [@khareparth12-sketch](https://github.com/khareparth12-sketch)
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  Built with ❤️ using FastAPI, Streamlit, and XGBoost
+</p>
