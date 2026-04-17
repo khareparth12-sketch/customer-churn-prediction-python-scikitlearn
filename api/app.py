@@ -1,13 +1,17 @@
+#api\app.py
 from fastapi import FastAPI
 import joblib
 import pandas as pd
 from api.utils import FEATURE_COLUMNS, NUMERIC_COLUMNS
 from api.schema import CustomerData
+import shap
 
 app = FastAPI(title="Customer Churn Prediction API")
 
 model = joblib.load("models/xgb_tuned_model.pkl")
 scaler = joblib.load("models/scaler.pkl")
+
+shap_explainer = None
 
 @app.get("/")
 def home():
@@ -25,9 +29,22 @@ def predict(data: CustomerData):
 
     risk = "High" if prob > 0.35 else "Low"
 
+    explainer = shap.Explainer(model)
+    sv = explainer(df)
+
     return {
         "churn_probability": float(prob),
-        "churn_risk": risk
+        "churn_risk": risk,
+
+        "shap_explanation": {
+            "base_value": float(sv.base_values[0]),
+
+            "shap_values": sv.values[0].tolist(),
+
+            "feature_names": FEATURE_COLUMNS,
+
+            "feature_values": input_dict
+        }
     }
 
 @app.get("/health")

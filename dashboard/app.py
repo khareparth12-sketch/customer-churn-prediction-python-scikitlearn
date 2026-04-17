@@ -1,3 +1,5 @@
+#dashboard\app.py
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -6,7 +8,7 @@ import requests
 import os
 import time
 
-API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+API_URL = os.getenv("API_URL", "http://api:8000")
 
 # -----------------------------
 # PAGE CONFIG
@@ -163,6 +165,8 @@ with tab2:
             prob = result["churn_probability"]
             risk = result["churn_risk"]
 
+            shap_data = result["shap_explanation"]
+
             fig = go.Figure(go.Indicator(
                 mode="gauge+number",
                 value=prob * 100,
@@ -183,3 +187,35 @@ with tab2:
                 st.error("High Churn Risk")
             else:
                 st.success("Low Churn Risk")
+
+            st.subheader("Why the Model Made This Prediction")
+
+            shap_vals = shap_data["shap_values"]
+            feat_names = shap_data["feature_names"]
+
+            ranked = sorted(
+                zip(shap_vals, feat_names),
+                key=lambda x: abs(x[0]),
+                reverse=True
+            )[:10]
+
+            vals, names = zip(*ranked)
+
+            colors = [
+                "red" if v > 0 else "green"
+                for v in vals
+            ]
+
+            fig = go.Figure(go.Bar(
+                x=list(vals),
+                y=list(names),
+                orientation="h",
+                marker_color=colors
+            ))
+
+            fig.update_layout(
+                title="Top Drivers of Churn Prediction",
+                yaxis=dict(autorange="reversed")
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
