@@ -29,7 +29,13 @@ def predict(data: CustomerData):
 
     risk = "High" if prob > 0.35 else "Low"
 
-    explainer = shap.Explainer(model)
+    booster = model.get_booster()
+
+    explainer = shap.TreeExplainer(
+        booster,
+        model_output="probability"
+    )
+
     sv = explainer(df)
 
     return {

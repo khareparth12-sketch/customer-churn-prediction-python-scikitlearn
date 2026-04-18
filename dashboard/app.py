@@ -93,7 +93,7 @@ with tab3:
     st.dataframe(customer_data.to_frame().astype(str))
 
 # -----------------------------
-# API CALL FUNCTION (FIXED)
+# API CALL FUNCTION 
 # -----------------------------
 def call_api(payload):
     for _ in range(5):
@@ -104,9 +104,9 @@ def call_api(payload):
                 timeout=5
             )
             return res.json()
-        except:
+        except Exception as e:
             time.sleep(2)
-    return {"error": "API not reachable"}
+    return {"error": str(e)}
 
 # -----------------------------
 # PREDICTION TAB
