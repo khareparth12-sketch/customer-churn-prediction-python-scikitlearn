@@ -165,7 +165,7 @@ with tab2:
             prob = result["churn_probability"]
             risk = result["churn_risk"]
 
-            shap_data = result["shap_explanation"]
+            #shap_data = result["shap_explanation"]
 
             fig = go.Figure(go.Indicator(
                 mode="gauge+number",
@@ -188,34 +188,34 @@ with tab2:
             else:
                 st.success("Low Churn Risk")
 
-            st.subheader("Why the Model Made This Prediction")
+            # st.subheader("Why the Model Made This Prediction")
 
-            shap_vals = shap_data["shap_values"]
-            feat_names = shap_data["feature_names"]
+            # shap_vals = shap_data["shap_values"]
+            # feat_names = shap_data["feature_names"]
 
-            ranked = sorted(
-                zip(shap_vals, feat_names),
-                key=lambda x: abs(x[0]),
-                reverse=True
-            )[:10]
+            # ranked = sorted(
+            #     zip(shap_vals, feat_names),
+            #     key=lambda x: abs(x[0]),
+            #     reverse=True
+            # )[:10]
 
-            vals, names = zip(*ranked)
+            # vals, names = zip(*ranked)
 
-            colors = [
-                "red" if v > 0 else "green"
-                for v in vals
-            ]
+            # colors = [
+            #     "red" if v > 0 else "green"
+            #     for v in vals
+            # ]
 
-            fig = go.Figure(go.Bar(
-                x=list(vals),
-                y=list(names),
-                orientation="h",
-                marker_color=colors
-            ))
+            # fig = go.Figure(go.Bar(
+            #     x=list(vals),
+            #     y=list(names),
+            #     orientation="h",
+            #     marker_color=colors
+            # ))
 
-            fig.update_layout(
-                title="Top Drivers of Churn Prediction",
-                yaxis=dict(autorange="reversed")
-            )
+            # fig.update_layout(
+            #     title="Top Drivers of Churn Prediction",
+            #     yaxis=dict(autorange="reversed")
+            # )
 
-            st.plotly_chart(fig, use_container_width=True)
+            # st.plotly_chart(fig, use_container_width=True)
