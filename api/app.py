@@ -11,7 +11,25 @@ app = FastAPI(title="Customer Churn Prediction API")
 model = joblib.load("models/xgb_tuned_model.pkl")
 scaler = joblib.load("models/scaler.pkl")
 
-shap_explainer = None
+background_df = pd.read_csv(
+    "data/processed/telco_final_processed.csv"
+)
+
+background_data = background_df[FEATURE_COLUMNS].sample(
+    50,
+    random_state=42
+)
+
+background_data[NUMERIC_COLUMNS] = scaler.transform(
+    background_data[NUMERIC_COLUMNS]
+)
+
+shap_explainer = shap.Explainer(
+    model.predict_proba,
+    background_data
+)
+
+#shap_explainer = None
 
 @app.get("/")
 def home():
@@ -52,6 +70,42 @@ def predict(data: CustomerData):
         #     "feature_values": input_dict
         # }
     }
+
+@app.post("/explain")
+def explain(data: CustomerData):
+
+    try:
+        input_dict = data.dict()
+
+        df = pd.DataFrame([input_dict])
+
+        df = df.reindex(
+            columns=FEATURE_COLUMNS,
+            fill_value=0
+        )
+
+        df[NUMERIC_COLUMNS] = scaler.transform(
+            df[NUMERIC_COLUMNS]
+        )
+
+        sv = shap_explainer(df)
+
+        return {
+            "base_value": float(sv.base_values[0,1]),
+
+            "shap_values": sv.values[0,:,1].tolist(),
+
+            "feature_names":
+                FEATURE_COLUMNS,
+
+            "feature_values":
+                input_dict
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
 
 @app.get("/health")
 def health_check():
