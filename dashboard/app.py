@@ -108,6 +108,17 @@ def call_api(payload):
             time.sleep(2)
     return {"error": str(e)}
 
+def call_explain_api(payload):
+    try:
+        res = requests.post(
+            f"{API_URL}/explain",
+            json=payload,
+            timeout=10
+        )
+        return res.json()
+    except Exception as e:
+        return {"error": str(e)}
+
 # -----------------------------
 # PREDICTION TAB
 # -----------------------------
@@ -140,9 +151,9 @@ with tab2:
             "PaperlessBilling": 1,
             "MonthlyCharges": monthly,
             "TotalCharges": total,
-            "MultipleLines_No phone service": 0,
+            "MultipleLines_No_phone_service": 0,
             "MultipleLines_Yes": 1,
-            "InternetService_Fiber optic": 1,
+            "InternetService_Fiber_optic": 1,
             "InternetService_No": 0,
             "OnlineSecurity_Yes": 0,
             "OnlineBackup_Yes": 1,
@@ -152,12 +163,13 @@ with tab2:
             "StreamingMovies_Yes": 1,
             "Contract_One year": 0,
             "Contract_Two year": 0,
-            "PaymentMethod_Credit card (automatic)": 0,
-            "PaymentMethod_Electronic check": 1,
-            "PaymentMethod_Mailed check": 0
+            "PaymentMethod_Credit_card_automatic": 0,
+            "PaymentMethod_Electronic_check": 1,
+            "PaymentMethod_Mailed_check": 0
         }
 
         result = call_api(payload)
+        explain_result = call_explain_api(payload)
 
         if "error" in result:
             st.error("API not reachable")
@@ -188,34 +200,39 @@ with tab2:
             else:
                 st.success("Low Churn Risk")
 
-            # st.subheader("Why the Model Made This Prediction")
+            if explain_result and "shap_values" in explain_result:
 
-            # shap_vals = shap_data["shap_values"]
-            # feat_names = shap_data["feature_names"]
+                st.subheader("Top Factors Driving This Prediction")
 
-            # ranked = sorted(
-            #     zip(shap_vals, feat_names),
-            #     key=lambda x: abs(x[0]),
-            #     reverse=True
-            # )[:10]
+                shap_vals = explain_result["shap_values"]
+                feat_names = explain_result["feature_names"]
 
-            # vals, names = zip(*ranked)
+                ranked = sorted(
+                    zip(shap_vals, feat_names),
+                    key=lambda x: abs(x[0]),
+                    reverse=True
+                )[:10]
 
-            # colors = [
-            #     "red" if v > 0 else "green"
-            #     for v in vals
-            # ]
+                vals, names = zip(*ranked)
 
-            # fig = go.Figure(go.Bar(
-            #     x=list(vals),
-            #     y=list(names),
-            #     orientation="h",
-            #     marker_color=colors
-            # ))
+                colors = [
+                    "red" if v > 0 else "green"
+                    for v in vals
+                ]
 
-            # fig.update_layout(
-            #     title="Top Drivers of Churn Prediction",
-            #     yaxis=dict(autorange="reversed")
-            # )
+                fig = go.Figure(go.Bar(
+                    x=list(vals),
+                    y=list(names),
+                    orientation="h",
+                    marker_color=colors
+                ))
 
-            # st.plotly_chart(fig, use_container_width=True)
+                fig.update_layout(
+                    title="Top Drivers of Churn Prediction",
+                    yaxis=dict(autorange="reversed")
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+
+            else:
+                st.warning("Explanation unavailable")
