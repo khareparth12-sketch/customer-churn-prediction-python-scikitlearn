@@ -10,6 +10,7 @@ joblib
 fastapi
 uvicorn
 pydantic
+redis[hiredis]
 
 # Dashboard & Frontend
 streamlit

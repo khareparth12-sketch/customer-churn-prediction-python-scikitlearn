@@ -1,10 +1,11 @@
 #api\app.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import joblib
 import pandas as pd
 from api.utils import FEATURE_COLUMNS, NUMERIC_COLUMNS
 from api.schema import CustomerData
 import shap
+from cache import make_cache_key, get_cached, set_cached
 
 app = FastAPI(title="Customer Churn Prediction API")
 
@@ -35,44 +36,37 @@ shap_explainer = shap.Explainer(
 def home():
     return {"message": "Churn Prediction API running"}
 
+# AFTER
 @app.post("/predict")
-def predict(data: CustomerData):
+async def predict(data: CustomerData):
     input_dict = data.dict()
+    cache_key = make_cache_key(input_dict)
 
+    # Cache HIT
+    cached = await get_cached(cache_key)
+    if cached:
+        cached["x_cache"] = "HIT"
+        return cached
+
+    # Cache MISS — run inference
     df = pd.DataFrame([input_dict])
     df = df.reindex(columns=FEATURE_COLUMNS, fill_value=0)
     df[NUMERIC_COLUMNS] = scaler.transform(df[NUMERIC_COLUMNS])
 
     prob = model.predict_proba(df)[0][1]
-
     risk = "High" if prob > 0.35 else "Low"
 
-    # booster = model.get_booster()
-
-    # explainer = shap.TreeExplainer(
-    #     booster,
-    #     model_output="probability"
-    # )
-
-    # sv = explainer(df)
-
-    return {
+    result = {
         "churn_probability": float(prob),
         "churn_risk": risk,
-
-        # "shap_explanation": {
-        #     "base_value": float(sv.base_values[0]),
-
-        #     "shap_values": sv.values[0].tolist(),
-
-        #     "feature_names": FEATURE_COLUMNS,
-
-        #     "feature_values": input_dict
-        # }
     }
 
+    await set_cached(cache_key, result)
+    result["x_cache"] = "MISS"
+    return result
+
 @app.post("/explain")
-def explain(data: CustomerData):
+async def explain(data: CustomerData):
 
     try:
         input_dict = data.dict()
@@ -108,8 +102,8 @@ def explain(data: CustomerData):
         }
 
 @app.get("/health")
-def health_check():
-    return {"status": "API running"}
+async def health():
+    return {"status": "ok"}
 
 @app.get("/model-info")
 def model_info():
