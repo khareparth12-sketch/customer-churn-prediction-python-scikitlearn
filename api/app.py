@@ -5,7 +5,7 @@ import pandas as pd
 from api.utils import FEATURE_COLUMNS, NUMERIC_COLUMNS
 from api.schema import CustomerData
 import shap
-from cache import make_cache_key, get_cached, set_cached
+from api.cache import make_cache_key, get_cached, set_cached
 
 app = FastAPI(title="Customer Churn Prediction API")
 

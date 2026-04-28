@@ -95,7 +95,9 @@ with tab3:
 # -----------------------------
 # API CALL FUNCTION 
 # -----------------------------
+# AFTER
 def call_api(payload):
+    last_error = None
     for _ in range(5):
         try:
             res = requests.post(
@@ -105,8 +107,9 @@ def call_api(payload):
             )
             return res.json()
         except Exception as e:
+            last_error = e
             time.sleep(2)
-    return {"error": str(e)}
+    return {"error": str(last_error)}
 
 def call_explain_api(payload):
     try:

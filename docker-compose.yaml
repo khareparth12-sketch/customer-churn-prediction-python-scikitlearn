@@ -1,5 +1,5 @@
 services:
-  redis:                            
+  redis:
     image: redis:7-alpine
     restart: unless-stopped
     healthcheck:
@@ -9,16 +9,22 @@ services:
       retries: 3
 
   api:
-    build: ./api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn api.app:app --host 0.0.0.0 --port 8000
     restart: unless-stopped
     ports:
       - "8000:8000"
     depends_on:
-      redis:                          
+      redis:
         condition: service_healthy
 
   frontend:
-    build: ./dashboard
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run dashboard/app.py --server.port 10000 --server.address 0.0.0.0
     restart: unless-stopped
     ports:
       - "10000:10000"
