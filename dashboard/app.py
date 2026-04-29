@@ -122,9 +122,9 @@ def call_explain_api(payload):
     except Exception as e:
         return {"error": str(e)}
 
-# -----------------------------
+# ----------------------------
 # PREDICTION TAB
-# -----------------------------
+# ----------------------------
 with tab2:
     st.subheader("Live Customer Churn Prediction")
 
