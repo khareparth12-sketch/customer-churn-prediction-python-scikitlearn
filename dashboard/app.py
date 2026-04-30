@@ -164,8 +164,8 @@ with tab2:
             "TechSupport_Yes": 0,
             "StreamingTV_Yes": 1,
             "StreamingMovies_Yes": 1,
-            "Contract_One year": 0,
-            "Contract_Two year": 0,
+            "Contract_One_year": 0,
+            "Contract_Two_year": 0,
             "PaymentMethod_Credit_card_automatic": 0,
             "PaymentMethod_Electronic_check": 1,
             "PaymentMethod_Mailed_check": 0
@@ -174,8 +174,8 @@ with tab2:
         result = call_api(payload)
         explain_result = call_explain_api(payload)
 
-        if "error" in result:
-            st.error("API not reachable")
+        if "error" in result or "detail" in result:
+            st.error(f"API error: {result.get('detail', result.get('error'))}")
         else:
             prob = result["churn_probability"]
             risk = result["churn_risk"]
