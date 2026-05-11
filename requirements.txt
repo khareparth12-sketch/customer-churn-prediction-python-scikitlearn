@@ -5,6 +5,7 @@ scikit-learn
 xgboost
 shap>=0.44.0
 joblib
+mlflow
 
 # API Backend
 fastapi

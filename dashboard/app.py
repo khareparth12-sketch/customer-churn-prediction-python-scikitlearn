@@ -315,7 +315,7 @@ PLOT_LAYOUT = dict(
 )
 
 def dark(fig, **extra):
-    fig.update_layout(**PLOT_LAYOUT, **extra)
+    fig.update_layout(**{**PLOT_LAYOUT, **extra})
     return fig
 
 # -----------------------------------------------------------------------
@@ -429,14 +429,13 @@ with tab1:
                         line=dict(color="#080B12", width=3)),
             textfont=dict(family="DM Sans, sans-serif", color="#E2EAF4"),
         ))
-        fig.update_layout(
-            **PLOT_LAYOUT,
-            title="Churn Split",
-            annotations=[dict(text=f"{churn_rt:.1f}%<br><span style='font-size:10px'>churn</span>",
+        fig.update_layout(**{**PLOT_LAYOUT,
+            "title": "Churn Split",
+            "annotations": [dict(text=f"{churn_rt:.1f}%<br><span style='font-size:10px'>churn</span>",
                               font=dict(size=18, family="Syne, sans-serif", color="#FF4560"),
                               showarrow=False)],
-            showlegend=True,
-        )
+            "showlegend": True,
+        })
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
@@ -543,8 +542,9 @@ with tab2:
                         ),
                     ),
                 ))
-                fig.update_layout(**PLOT_LAYOUT, height=280,
-                                  margin=dict(l=20,r=20,t=40,b=0))
+                fig.update_layout(**{**PLOT_LAYOUT,
+                                    "height": 280,
+                                    "margin": dict(l=20,r=20,t=40,b=0)})
                 st.plotly_chart(fig, use_container_width=True)
 
             with rc2:
@@ -613,19 +613,19 @@ with tab2:
                                             line=dict(color="#FFB800",width=0))),
                 ))
 
-                fig.update_layout(
-                    **PLOT_LAYOUT,
-                    title=dict(
+                fig.update_layout(**{**PLOT_LAYOUT,
+                    "title": dict(
                         text=(f"Base {base_value:.3f} → Prediction {running:.3f}"
                               f"  <span style='color:#5A7194;font-size:10px'>"
                               f"(🔴 toward churn · 🔵 toward retain · 🟡 final)</span>"),
                         font=dict(family="Syne, sans-serif", color="#E2EAF4", size=12),
                     ),
-                    xaxis_title="SHAP contribution",
-                    yaxis=dict(autorange="reversed", gridcolor="#1E2D45",
+                    "xaxis_title": "SHAP contribution",
+                    "yaxis": dict(autorange="reversed", gridcolor="#1E2D45",
                                tickfont=dict(size=10)),
-                    height=460,
-                    shapes=[
+                    "height": 460,
+                    "margin": dict(l=10, r=50, t=56, b=20),
+                    "shapes": [
                         dict(type="line", x0=base_value, x1=base_value,
                              y0=-0.5, y1=len(display_names)-0.5,
                              line=dict(color="#5A7194", width=1, dash="dot")),
@@ -633,12 +633,11 @@ with tab2:
                              y0=-0.5, y1=len(display_names)-0.5,
                              line=dict(color="#FFB800", width=1.5, dash="dash")),
                     ],
-                    annotations=[dict(x=0.35, y=-0.5, text="threshold",
+                    "annotations": [dict(x=0.35, y=-0.5, text="threshold",
                                       showarrow=False,
                                       font=dict(size=9, color="#FFB800"),
                                       xanchor="left")],
-                    margin=dict(l=10, r=50, t=56, b=20),
-                )
+                })
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.warning("Explanation unavailable.")
