@@ -269,7 +269,7 @@ Built with Streamlit. **Dark Intelligence** theme — `#080B12` background, `#13
 ### 🔍 Customer Explorer
 ![Customer Explorer](screenshots/explore.png)
 
-### 🔍 Segments Tab
+### 📂 Segments Tab
 ![Segments Tab](screenshots/segment.png)
 
 ---
