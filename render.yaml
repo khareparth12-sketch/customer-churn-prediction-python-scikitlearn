@@ -32,3 +32,4 @@ services:
   - type: redis
     name: churn-redis
     plan: free
+    ipAllowList: []
