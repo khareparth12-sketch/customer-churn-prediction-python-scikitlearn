@@ -29,6 +29,6 @@ services:
           property: host
           envVarPrefix: https
 
-databases:
-  - name: churn-redis
+  - type: redis
+    name: churn-redis
     plan: free
