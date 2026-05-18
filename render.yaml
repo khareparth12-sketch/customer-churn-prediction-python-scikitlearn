@@ -30,7 +30,5 @@ services:
           envVarPrefix: https
 
 databases:
-  - type: redis
-    name: churn-redis
+  - name: churn-redis
     plan: free
-    maxmemoryPolicy: allkeys-lru
