@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: churn-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn api.app:app --host 0.0.0.0 --port 8000
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: churn-redis
+          property: connectionString
+      - key: PYTHON_ENV
+        value: production
+
+  - type: web
+    name: churn-frontend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: streamlit run dashboard/app.py --server.port 10000 --server.address 0.0.0.0
+    plan: free
+    envVars:
+      - key: API_URL
+        fromService:
+          type: web
+          name: churn-api
+          property: host
+          envVarPrefix: https
+
+databases:
+  - type: redis
+    name: churn-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
