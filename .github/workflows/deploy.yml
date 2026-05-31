@@ -47,7 +47,7 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}")
           echo "API deploy hook response: $STATUS"
-          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ] && [ "$STATUS" != "202" ]; then
             echo "Warning: unexpected status $STATUS — check RENDER_DEPLOY_HOOK_API secret"
             exit 1
           fi
@@ -56,7 +56,7 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}")
           echo "Frontend deploy hook response: $STATUS"
-          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ] && [ "$STATUS" != "202" ]; then
             echo "Warning: unexpected status $STATUS — check RENDER_DEPLOY_HOOK_FRONTEND secret"
             exit 1
           fi
