@@ -45,15 +45,21 @@ jobs:
     steps:
       - name: Deploy API service
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}" | grep -q "200\|201" \
-            && echo "API deploy triggered" || exit 1
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}")
+          echo "API deploy hook response: $STATUS"
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+            echo "Warning: unexpected status $STATUS — check RENDER_DEPLOY_HOOK_API secret"
+            exit 1
+          fi
 
       - name: Deploy Frontend service
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}" | grep -q "200\|201" \
-            && echo "Frontend deploy triggered" || exit 1
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}")
+          echo "Frontend deploy hook response: $STATUS"
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "201" ]; then
+            echo "Warning: unexpected status $STATUS — check RENDER_DEPLOY_HOOK_FRONTEND secret"
+            exit 1
+          fi
 
       - name: Wait and verify API health
         run: |
