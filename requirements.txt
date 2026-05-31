@@ -12,6 +12,7 @@ fastapi
 uvicorn
 pydantic
 redis[hiredis]
+pytest
 
 # Dashboard & Frontend
 streamlit

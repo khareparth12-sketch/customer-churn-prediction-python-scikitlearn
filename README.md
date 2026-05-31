@@ -386,7 +386,7 @@ churn-analysis/
 
 ## 🚀 Live Demo
 
-👉 **[https://customer-churn-prediction-python.onrender.com/](https://customer-churn-prediction-python.onrender.com/)**
+👉 **[https://churn-frontend-1s4b.onrender.com/](https://churn-frontend-1s4b.onrender.com/)**
 
 > ⚠️ Hosted on Render's free tier — may take **30–60 seconds to cold start** if idle.
 
